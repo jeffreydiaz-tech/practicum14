@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Nest</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f4;
+            color: #163020;
+            padding: 35px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Quiz Container Card Matching Screenshot */
+        .quiz-card {
+            background-color: #ffffff;
+            border: 1.5px solid #4ea377;
+            border-radius: 14px;
+            padding: 36px 40px;
+            max-width: 780px;
+            width: 100%;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+        }
+
+        .quiz-card h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #163020;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-text {
+            font-size: 14.5px;
+            color: #3a4f43;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+
+        .question-text {
+            font-size: 18.5px;
+            font-weight: 700;
+            color: #163020;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        /* Option Rows */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option-item {
+            background-color: #e6f2ec;
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #163020;
+            transition: background-color 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #d7ecdf;
+        }
+
+        .option-item input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1e4631;
+        }
+
+        /* Dark Green Next Button */
+        .next-btn {
+            background-color: #1e4631;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 7px;
+            font-size: 14.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .next-btn:hover {
+            background-color: #143222;
+        }
+
+        /* Score Summary View */
+        .score-box {
+            background-color: #e6f2ec;
+            border-left: 5px solid #2c6648;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-card">
+        <h1>🧩 Puzzle Nest Logic & Brain Teaser Quiz</h1>
+        <div id="quizContent"></div>
+    </div>
+
+    <script>
+        const quizQuestions = [
+            {
+                question: "Which number completes the sequence: 2, 6, 12, 20, 30, ?",
+                options: [
+                    "36",
+                    "40",
+                    "42",
+                    "44"
+                ],
+                correctIndex: 2
+            },
+            {
+                question: "A bat and a ball cost ₹110 in total. The bat costs ₹100 more than the ball. How much does the ball cost?",
+                options: [
+                    "₹10",
+                    "₹5",
+                    "₹15",
+                    "₹1"
+                ],
+                correctIndex: 1
+            },
+            {
+                question: "If you pass the person in 2nd place during a campus race, what position are you in now?",
+                options: [
+                    "1st place",
+                    "2nd place",
+                    "3rd place",
+                    "Last place"
+                ],
+                correctIndex: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function renderQuestion() {
+            const container = document.getElementById('quizContent');
+
+            if (currentQuestion >= quizQuestions.length) {
+                container.innerHTML = `
+                    <div class="score-box">
+                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">
+                            ✓ Puzzle Nest Quiz Completed!
+                        </div>
+                        <div>Your Final Score: <strong>${score} out of ${quizQuestions.length}</strong></div>
+                    </div>
+                    <button class="next-btn" onclick="restartQuiz()">Restart Quiz →</button>
+                `;
+                return;
+            }
+
+            const q = quizQuestions[currentQuestion];
+            const isLast = currentQuestion === quizQuestions.length - 1;
+
+            let optionsHtml = '<div class="options-list">';
+            q.options.forEach((opt, idx) => {
+                optionsHtml += `
+                    <label class="option-item">
+                        <input type="radio" name="quizOption" value="${idx}">
+                        <span>${opt}</span>
+                    </label>
+                `;
+            });
+            optionsHtml += '</div>';
+
+            container.innerHTML = `
+                <div class="progress-text">Question ${currentQuestion + 1} of ${quizQuestions.length}</div>
+                <div class="question-text">${q.question}</div>
+                ${optionsHtml}
+                <button class="next-btn" onclick="nextQuestion()">
+                    ${isLast ? 'Submit Quiz ✓' : 'Next Question →'}
+                </button>
+            `;
+        }
+
+        function nextQuestion() {
+            const selected = document.querySelector('input[name="quizOption"]:checked');
+            if (!selected) {
+                alert("Please select an answer before continuing.");
+                return;
+            }
+
+            if (parseInt(selected.value, 10) === quizQuestions[currentQuestion].correctIndex) {
+                score++;
+            }
+
+            currentQuestion++;
+            renderQuestion();
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            renderQuestion();
+        }
+
+        window.onload = renderQuestion;
+    </script>
+
+</body>
+</html>
